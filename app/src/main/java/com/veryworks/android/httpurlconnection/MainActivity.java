@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -18,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
 
     Button btnGet;
     EditText editUrl;
-    TextView txtResult;
+    TextView txtResult,txtTitle;
+    RelativeLayout progressLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
         btnGet = (Button) findViewById(R.id.btnGet);
         editUrl = (EditText) findViewById(R.id.editUrl);
         txtResult = (TextView) findViewById(R.id.textResult);
+        txtTitle = (TextView) findViewById(R.id.textTitle);
+
+        progressLayout = (RelativeLayout) findViewById(R.id.progressLayout);
 
         btnGet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
         new AsyncTask<String, Void, String>(){
 
             @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressLayout.setVisibility(View.VISIBLE);
+            }
+
+            @Override
             protected String doInBackground(String... params) {
                 String urlString = params[0];
                 try {
@@ -55,11 +66,13 @@ public class MainActivity extends AppCompatActivity {
                     // 2. url 로 네트워크 연결시작
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     // 3. url 연결에 대한 옵션 설정
-                    connection.setRequestMethod("GET"); // 가.GET  : 데이터 요청시 사용하는 방식
+                    // 가.GET  : 데이터 요청시 사용하는 방식
                     // 나.POST : 데이터 입력시
                     // 다.PUT  : 데이터 수정시
                     // 라.DELETE : 데이터 삭제시
+                    connection.setRequestMethod("GET");
                     // 4. 서버로부터 응답코드 회신
+                    // 응답코드의 종류는 HttpURLConnection에 상수로 정의되어 있음
                     int responseCode = connection.getResponseCode();
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         // 4.1 서버연결로 부터 스트림을 얻고, 버퍼래퍼로 감싼다
@@ -76,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Log.e("HTTPConnection", "Error Code=" + responseCode);
                     }
+
                 }catch(Exception e){
                     e.printStackTrace();
                 }
@@ -85,8 +99,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
+                // title 태그값 추출하기
+                String title = result.substring(result.indexOf("<title>")+7,result.indexOf("</title>"));
+                txtTitle.setText(title);
+
                 // 결과값 메인 UI 에 세팅
                 txtResult.setText(result);
+                progressLayout.setVisibility(View.GONE);
             }
 
         }.execute(urlString);
