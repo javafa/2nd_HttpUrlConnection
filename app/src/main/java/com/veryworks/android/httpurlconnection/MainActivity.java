@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 progressLayout.setVisibility(View.GONE);
             }
 
-        }.execute(urlString);
+        }.execute(urlString); // AsyncTask에 값 전달
 
 
     }
