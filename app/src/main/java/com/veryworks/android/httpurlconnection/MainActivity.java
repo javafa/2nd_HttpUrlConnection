@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
+                // 프로그레스바 시작
                 progressLayout.setVisibility(View.VISIBLE);
             }
 
@@ -105,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // 결과값 메인 UI 에 세팅
                 txtResult.setText(result);
+
+                // 프로그레스바 종료
                 progressLayout.setVisibility(View.GONE);
             }
 
